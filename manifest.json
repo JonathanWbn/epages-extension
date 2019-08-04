@@ -1,0 +1,21 @@
+{
+  "name": "ePages extension",
+  "version": "1.0",
+  "description": "TODO",
+  "permissions": ["<all_urls>"],
+  "browser_action": {
+    "default_popup": "popup.html",
+    "default_icon": "images/disabled.png"
+  },
+  "background": {
+    "scripts": ["background.js"],
+    "persistent": false
+  },
+  "icons": {
+    "16": "images/disabled.png",
+    "32": "images/disabled.png",
+    "48": "images/disabled.png",
+    "128": "images/disabled.png"
+  },
+  "manifest_version": 2
+}
