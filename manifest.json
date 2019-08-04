@@ -1,7 +1,7 @@
 {
-  "name": "ePages extension",
+  "name": "ePages Version Checker",
   "version": "1.0",
-  "description": "TODO",
+  "description": "Letting you know when you are visiting an ePages shop.",
   "permissions": ["<all_urls>"],
   "browser_action": {
     "default_popup": "popup.html",
