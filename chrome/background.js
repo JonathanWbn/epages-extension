@@ -16,7 +16,7 @@ const looksLikeAnEpagesVersion = version =>
 const getEpagesVersion = () =>
   new Promise(resolve => {
     window.chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (!tab.url) resolve(null);
+      if (!tab.url) return resolve(null);
 
       const [baseUrl] = tab.url.match(
         /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
