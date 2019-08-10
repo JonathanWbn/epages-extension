@@ -45,7 +45,10 @@ const getIsBeyondShop = async url => {
 
 (async () => {
   const url = await getUrl();
-  if (!url) return;
+  if (!url) {
+    document.getElementById("not-epages").style.display = "block";
+    return;
+  }
 
   const [baseUrl] = url.match(
     /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
