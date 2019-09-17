@@ -1,1 +1,1 @@
-_The extension has been submitted for publishing and is waiting for approval._
+Chrome Web Store: https://chrome.google.com/webstore/detail/epages-version-checker/aggkmdobnlnhmcnpofelehpnemdnnikj
