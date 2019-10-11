@@ -20,6 +20,7 @@ const isBeyondShop = async url => {
 (async () => {
   const url = await getCurrentUrl();
   if (!url) {
+    document.getElementById("loading").style.display = "none";
     document.getElementById("not-epages").style.display = "block";
     return;
   }
@@ -30,18 +31,17 @@ const isBeyondShop = async url => {
   const ePagesVersion = await getEpagesVersion(baseUrl);
 
   if (ePagesVersion) {
-    document.getElementById("epages-details").style.display = "block";
-    document.getElementById("product").innerText = (await isBeyondShop(baseUrl))
-      ? "BEYOND"
-      : "NOW";
+    const product = (await isBeyondShop(baseUrl)) ? "BEYOND" : "NOW";
+    document.getElementById("loading").style.display = "none";
+    document.getElementById("product").innerText = product;
     document.getElementById("version").innerText = `${
       ePagesVersion.describe
     } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
   } else if (await looksLikeABaseShop(baseUrl)) {
-    document.getElementById("epages-details").style.display = "block";
+    document.getElementById("loading").style.display = "none";
     document.getElementById("product").innerText = "BASE";
-    document.getElementById("version-key").style.display = "none";
   } else {
+    document.getElementById("loading").style.display = "none";
     document.getElementById("not-epages").style.display = "block";
   }
 })();
