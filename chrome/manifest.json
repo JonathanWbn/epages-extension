@@ -1,6 +1,6 @@
 {
   "name": "ePages Version Checker",
-  "version": "1.1",
+  "version": "1.2",
   "description": "Letting you know when you are visiting an ePages shop.",
   "permissions": ["<all_urls>"],
   "browser_action": {
