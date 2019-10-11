@@ -1,6 +1,10 @@
 "use strict";
 
-import { getCurrentUrl, getEpagesVersion } from "./helpers.js";
+import {
+  getCurrentUrl,
+  getEpagesVersion,
+  looksLikeABaseShop
+} from "./helpers.js";
 
 const isBeyondShop = async url => {
   try {
@@ -33,6 +37,10 @@ const isBeyondShop = async url => {
     document.getElementById("version").innerText = `${
       ePagesVersion.describe
     } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
+  } else if (await looksLikeABaseShop(baseUrl)) {
+    document.getElementById("epages-details").style.display = "block";
+    document.getElementById("product").innerText = "BASE";
+    document.getElementById("version-key").style.display = "none";
   } else {
     document.getElementById("not-epages").style.display = "block";
   }

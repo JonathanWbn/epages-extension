@@ -1,4 +1,4 @@
-export const looksLikeAnEpagesVersion = version =>
+const looksLikeAnEpagesVersion = version =>
   Boolean(
     version &&
       version.author &&
@@ -14,18 +14,31 @@ export const looksLikeAnEpagesVersion = version =>
 export const getCurrentUrl = async () =>
   new Promise(resolve => {
     window.chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (!tab.url) resolve(null);
+      if (!tab || !tab.url) resolve(null);
       else resolve(tab.url);
     });
   });
 
 export const getEpagesVersion = async url => {
   try {
-    const response = await fetch(`${url}/version.json`);
-    const version = await response.json();
+    const version = await (await fetch(`${url}/version.json`)).json();
 
     return looksLikeAnEpagesVersion(version) ? version : null;
   } catch {
     return null;
+  }
+};
+
+export const looksLikeABaseShop = async url => {
+  try {
+    const result = await fetch(`${url}/WebRoot/WebAdapterError.html`);
+    const html = await result.text();
+    if (html.includes("Your request couldn't be served. Please try again.")) {
+      return true;
+    } else {
+      return false;
+    }
+  } catch {
+    return false;
   }
 };

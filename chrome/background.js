@@ -1,6 +1,10 @@
 "use strict";
 
-import { getCurrentUrl, getEpagesVersion } from "./helpers.js";
+import {
+  getCurrentUrl,
+  getEpagesVersion,
+  looksLikeABaseShop
+} from "./helpers.js";
 
 const updateIcon = async () => {
   const url = await getCurrentUrl();
@@ -9,9 +13,10 @@ const updateIcon = async () => {
       /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
     );
 
-    const epagesVersion = await getEpagesVersion(baseUrl);
-
-    if (epagesVersion) {
+    if (await getEpagesVersion(baseUrl)) {
+      window.chrome.browserAction.setIcon({ path: "images/enabled.png" });
+      return;
+    } else if (await looksLikeABaseShop(baseUrl)) {
       window.chrome.browserAction.setIcon({ path: "images/enabled.png" });
       return;
     }
