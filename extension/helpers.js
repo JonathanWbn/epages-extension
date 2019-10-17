@@ -11,13 +11,23 @@ const looksLikeAnEpagesVersion = version =>
       version.tag
   );
 
-export const getCurrentUrl = async () =>
-  new Promise(resolve => {
-    window.chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-      if (!tab || !tab.url) resolve(null);
-      else resolve(tab.url);
+export const getCurrentUrl = async () => {
+  if (chrome) {
+    return new Promise(resolve => {
+      chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        if (!tab || !tab.url) resolve(null);
+        else resolve(tab.url);
+      });
     });
-  });
+  } else {
+    const [tab] = await browser.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+    if (!tab || !tab.url) return null;
+    else return tab.url;
+  }
+};
 
 export const getEpagesVersion = async url => {
   try {

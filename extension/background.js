@@ -1,10 +1,10 @@
-"use strict";
-
 import {
   getCurrentUrl,
   getEpagesVersion,
   looksLikeABaseShop
 } from "./helpers.js";
+
+window.browser = window.browser || window.chrome;
 
 const updateIcon = async () => {
   const url = await getCurrentUrl();
@@ -14,16 +14,16 @@ const updateIcon = async () => {
     );
 
     if (await getEpagesVersion(baseUrl)) {
-      window.chrome.browserAction.setIcon({ path: "images/enabled.png" });
+      browser.browserAction.setIcon({ path: "images/enabled.png" });
       return;
     } else if (await looksLikeABaseShop(baseUrl)) {
-      window.chrome.browserAction.setIcon({ path: "images/enabled.png" });
+      browser.browserAction.setIcon({ path: "images/enabled.png" });
       return;
     }
   }
-  window.chrome.browserAction.setIcon({ path: "images/disabled.png" });
+  browser.browserAction.setIcon({ path: "images/disabled.png" });
 };
 
-chrome.tabs.onUpdated.addListener(updateIcon);
-chrome.tabs.onActivated.addListener(updateIcon);
-chrome.runtime.onInstalled.addListener(updateIcon);
+browser.tabs.onUpdated.addListener(updateIcon);
+browser.tabs.onActivated.addListener(updateIcon);
+browser.runtime.onInstalled.addListener(updateIcon);
