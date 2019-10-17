@@ -1,3 +1,3 @@
 #!/bin/bash
 
-zip -r extension ./extension*
+zip -r chrome ./extension* && cd extension && zip -r firefox ./** && mv firefox.zip ../
