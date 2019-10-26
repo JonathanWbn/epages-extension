@@ -31,12 +31,38 @@ const isBeyondShop = async url => {
   const ePagesVersion = await getEpagesVersion(baseUrl);
 
   if (ePagesVersion) {
-    const product = (await isBeyondShop(baseUrl)) ? "BEYOND" : "NOW";
+    const beyondShop = await isBeyondShop(baseUrl);
+    const product = beyondShop ? "BEYOND" : "NOW";
     document.getElementById("loading").style.display = "none";
     document.getElementById("product").innerText = product;
     document.getElementById("version").innerText = `${
       ePagesVersion.describe
     } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
+
+    if (beyondShop) {
+      chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+        if (tab) {
+          chrome.tabs.sendMessage(
+            tab.id,
+            { text: "check_if_checkout" },
+            async () => {
+              const wait = ms =>
+                new Promise(resolve => setTimeout(resolve, ms));
+              await wait(1000);
+
+              const fastCheckout = document.getElementById("fast-checkout");
+              fastCheckout.style.display = "block";
+              const checkoutButton = document.getElementById("checkout-button");
+              checkoutButton.onclick = () =>
+                chrome.tabs.sendMessage(tab.id, {
+                  text: "fast_checkout",
+                  profile: "jane_doe"
+                });
+            }
+          );
+        }
+      });
+    }
   } else if (await looksLikeABaseShop(baseUrl)) {
     document.getElementById("loading").style.display = "none";
     document.getElementById("product").innerText = "BASE";
