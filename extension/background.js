@@ -7,7 +7,6 @@ import {
 window.browser = window.browser || window.chrome;
 
 const updateIcon = async () => {
-  chrome.tabs.executeScript({ file: "content.js" });
   const url = await getCurrentUrl();
   if (url) {
     const [baseUrl] = url.match(
