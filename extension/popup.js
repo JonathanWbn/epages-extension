@@ -41,7 +41,8 @@ const isBeyondShop = async url => {
 
     if (beyondShop) {
       chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (tab) {
+        if (false) {
+          // if (tab) {
           chrome.tabs.sendMessage(
             tab.id,
             { text: "check_if_checkout" },

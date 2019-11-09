@@ -1,27 +1,22 @@
-import {
-  getCurrentUrl,
-  getEpagesVersion,
-  looksLikeABaseShop
-} from "./helpers.js";
+import { getTab } from "./helpers.js";
 
 window.browser = window.browser || window.chrome;
 
 const updateIcon = async () => {
-  const url = await getCurrentUrl();
-  if (url) {
-    const [baseUrl] = url.match(
-      /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
-    );
+  chrome.tabs.executeScript({ file: "background-content.js" });
 
-    if (await getEpagesVersion(baseUrl)) {
-      browser.browserAction.setIcon({ path: "images/enabled.png" });
-      return;
-    } else if (await looksLikeABaseShop(baseUrl)) {
-      browser.browserAction.setIcon({ path: "images/enabled.png" });
-      return;
+  const tab = await getTab();
+  chrome.tabs.sendMessage(
+    tab.id,
+    { text: "is_epages_shop" },
+    async isEpagesShop => {
+      if (isEpagesShop) {
+        browser.browserAction.setIcon({ path: "images/enabled.png" });
+      } else {
+        browser.browserAction.setIcon({ path: "images/disabled.png" });
+      }
     }
-  }
-  browser.browserAction.setIcon({ path: "images/disabled.png" });
+  );
 };
 
 browser.tabs.onUpdated.addListener(updateIcon);

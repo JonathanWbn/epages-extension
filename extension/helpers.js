@@ -11,6 +11,22 @@ const looksLikeAnEpagesVersion = version =>
       version.tag
   );
 
+export const getTab = async () => {
+  if (chrome) {
+    return new Promise(resolve => {
+      chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) =>
+        resolve(tab)
+      );
+    });
+  } else {
+    const [tab] = await browser.tabs.query({
+      active: true,
+      currentWindow: true
+    });
+    return tab;
+  }
+};
+
 export const getCurrentUrl = async () => {
   if (chrome) {
     return new Promise(resolve => {
