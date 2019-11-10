@@ -1,6 +1,8 @@
 "use strict";
 
-chrome.runtime.onMessage.addListener(async function(msg, sender, cb) {
+window.browser = window.browser || window.chrome;
+
+browser.runtime.onMessage.addListener(async function(msg, sender, cb) {
   if (msg.text === "check_if_checkout") {
     const checkoutButton = document.querySelector(
       ".cart-totals-button-checkout"

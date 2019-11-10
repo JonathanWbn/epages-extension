@@ -1,11 +1,13 @@
 "use strict";
 
-chrome.runtime.onMessage.addListener(async function(msg, sender, cb) {
+window.browser = window.browser || window.chrome;
+
+browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
   if (msg.text === "is_epages_shop") {
     const head = document.getElementsByTagName("head")[0];
-    const occurenceOfEpages = head.innerHTML.match(/epages/g).length;
+    const occurencesOfEpages = head.innerHTML.match(/epages/g).length;
 
-    if (occurenceOfEpages > 5) cb(true);
-    else cb(false);
+    if (occurencesOfEpages > 5) sendResponse(true);
+    else sendResponse(false);
   }
 });

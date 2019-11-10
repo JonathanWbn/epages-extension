@@ -1,8 +1,8 @@
 {
   "name": "ePages Version Checker",
-  "version": "1.2",
+  "version": "1.3",
   "description": "Letting you know when you are visiting an ePages shop.",
-  "permissions": ["http://*/*", "https://*/*"],
+  "permissions": ["tabs", "http://*/*", "https://*/*"],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "images/disabled.png"

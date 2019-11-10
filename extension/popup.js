@@ -6,6 +6,8 @@ import {
   looksLikeABaseShop
 } from "./helpers.js";
 
+window.browser = window.browser || window.chrome;
+
 const isBeyondShop = async url => {
   try {
     const response = await fetch(`${url}/api/v2/shop`);
@@ -40,10 +42,10 @@ const isBeyondShop = async url => {
     } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
 
     if (beyondShop) {
-      chrome.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
+      browser.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
         if (false) {
           // if (tab) {
-          chrome.tabs.sendMessage(
+          browser.tabs.sendMessage(
             tab.id,
             { text: "check_if_checkout" },
             async () => {
@@ -55,7 +57,7 @@ const isBeyondShop = async url => {
               fastCheckout.style.display = "block";
               const checkoutButton = document.getElementById("checkout-button");
               checkoutButton.onclick = () =>
-                chrome.tabs.sendMessage(tab.id, {
+                browser.tabs.sendMessage(tab.id, {
                   text: "fast_checkout",
                   profile: "jane_doe"
                 });
