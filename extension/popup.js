@@ -1,10 +1,6 @@
 "use strict";
 
-import {
-  getCurrentUrl,
-  getEpagesVersion,
-  looksLikeABaseShop
-} from "./helpers.js";
+import { getEpagesVersion, getTab, looksLikeABaseShop } from "./helpers.js";
 
 window.browser = window.browser || window.chrome;
 
@@ -19,13 +15,29 @@ const isBeyondShop = async url => {
   }
 };
 
+const markAsNotEpages = () => {
+  document.getElementById("loading").style.display = "none";
+  document.getElementById("not-epages").style.display = "block";
+};
+
 (async () => {
-  const url = await getCurrentUrl();
-  if (!url) {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("not-epages").style.display = "block";
-    return;
-  }
+  const tab = await getTab();
+
+  if (!tab) return markAsNotEpages();
+
+  browser.tabs.executeScript({ file: "background-content.js" });
+  const isEpagesShop = await new Promise(resolve => {
+    browser.tabs.sendMessage(
+      tab.id,
+      { text: "is_epages_shop" },
+      async isEpagesShop => {
+        resolve(isEpagesShop);
+      }
+    );
+  });
+
+  const url = tab && tab.url;
+  if (!url || !isEpagesShop) return markAsNotEpages();
 
   const [baseUrl] = url.match(
     /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
@@ -70,7 +82,6 @@ const isBeyondShop = async url => {
     document.getElementById("loading").style.display = "none";
     document.getElementById("product").innerText = "BASE";
   } else {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("not-epages").style.display = "block";
+    markAsNotEpages();
   }
 })();

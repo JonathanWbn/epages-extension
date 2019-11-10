@@ -27,13 +27,6 @@ export const getTab = async () => {
   }
 };
 
-export const getCurrentUrl = async () => {
-  const tab = await getTab();
-
-  if (tab && tab.url) return tab.url;
-  else return null;
-};
-
 export const getEpagesVersion = async url => {
   try {
     const version = await (await fetch(`${url}/version.json`)).json();
