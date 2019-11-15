@@ -52,32 +52,6 @@ const markAsNotEpages = () => {
     document.getElementById("version").innerText = `${
       ePagesVersion.describe
     } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
-
-    if (beyondShop) {
-      browser.tabs.query({ active: true, currentWindow: true }, ([tab]) => {
-        if (false) {
-          // if (tab) {
-          browser.tabs.sendMessage(
-            tab.id,
-            { text: "check_if_checkout" },
-            async () => {
-              const wait = ms =>
-                new Promise(resolve => setTimeout(resolve, ms));
-              await wait(1000);
-
-              const fastCheckout = document.getElementById("fast-checkout");
-              fastCheckout.style.display = "block";
-              const checkoutButton = document.getElementById("checkout-button");
-              checkoutButton.onclick = () =>
-                browser.tabs.sendMessage(tab.id, {
-                  text: "fast_checkout",
-                  profile: "jane_doe"
-                });
-            }
-          );
-        }
-      });
-    }
   } else if (await looksLikeABaseShop(baseUrl)) {
     document.getElementById("loading").style.display = "none";
     document.getElementById("product").innerText = "BASE";
