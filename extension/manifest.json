@@ -1,6 +1,6 @@
 {
   "name": "ePages Version Checker",
-  "version": "1.4",
+  "version": "1.5",
   "description": "Letting you know when you are visiting an ePages shop.",
   "permissions": ["tabs", "http://*/*", "https://*/*"],
   "browser_action": {
@@ -11,9 +11,6 @@
     "page": "background.html"
   },
   "icons": {
-    "16": "images/enabled.png",
-    "32": "images/enabled.png",
-    "48": "images/enabled.png",
     "128": "images/enabled.png"
   },
   "manifest_version": 2
