@@ -8,7 +8,7 @@ browser.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
 
     const looksLikeNowOrBeyondShop =
       head.innerHTML.match(/epages\.base/g) &&
-      head.innerHTML.match(/epages\.base/g).length > 4;
+      head.innerHTML.match(/epages\.base/g).length > 3;
     const looksLikeBaseShop = head.innerHTML.includes("epages.js");
 
     if (looksLikeNowOrBeyondShop || looksLikeBaseShop) sendResponse(true);
