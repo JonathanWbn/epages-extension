@@ -15,6 +15,18 @@ const isBeyondShop = async url => {
   }
 };
 
+const themes = {
+  neutral: ['basic', 'light', 'solid'],
+  vision: ['elegant', 'young', 'glossy'],
+  essence: ['classic', 'pure', 'fresh'],
+  limelight: ['bold', 'harmonic', 'current'],
+  editorial: ['modern', 'vintage', 'vivid'],
+  uptown: ['cool', 'deep', 'sweet'],
+  structure: ['contemporary', 'individual', 'prime'],
+}
+
+
+
 const markAsNotEpages = () => {
   document.getElementById("loading").style.display = "none";
   document.getElementById("not-epages").style.display = "block";
@@ -22,6 +34,35 @@ const markAsNotEpages = () => {
 
 (async () => {
   const tab = await getTab();
+  const themeSelect = document.getElementById("theme-select")
+  const themeButton = document.getElementById("theme-button")
+  const styleSelect = document.getElementById("style-select")
+  const emptyOption = document.getElementById("empty-option")
+
+  Object.keys(themes).forEach((theme) => {
+    const option = document.createElement("option")
+    option.setAttribute("value", theme);
+    option.innerText = `Theme ${theme.charAt(0).toUpperCase()}${theme.slice(1)}`;
+    themeSelect.appendChild(option)
+  })
+
+  themeButton.onclick = () => {
+    const theme = themeSelect.value
+    const style = styleSelect.value
+    chrome.tabs.update(tab.id, { url: `${tab.url}?ViewAction=UnityMBO-ViewSFThemePreview&previewTheme=epages.${theme}@dev&themeStyle=${style}` });
+  };
+
+  themeSelect.onchange = () => {
+    if (emptyOption) themeSelect.removeChild(emptyOption)
+    styleSelect.style.display = "block";
+    styleSelect.innerHTML = '';
+    themes[themeSelect.value].forEach(style => {
+      const option = document.createElement("option")
+      option.setAttribute("value", style);
+      option.innerText = `Style ${style.charAt(0).toUpperCase()}${style.slice(1)}`;
+      styleSelect.appendChild(option);
+    });
+  };
 
   if (!tab) return markAsNotEpages();
 
