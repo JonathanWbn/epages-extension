@@ -16,16 +16,14 @@ const isBeyondShop = async url => {
 };
 
 const themes = {
-  neutral: ['basic', 'light', 'solid'],
-  vision: ['elegant', 'young', 'glossy'],
-  essence: ['classic', 'pure', 'fresh'],
-  limelight: ['bold', 'harmonic', 'current'],
-  editorial: ['modern', 'vintage', 'vivid'],
-  uptown: ['cool', 'deep', 'sweet'],
-  structure: ['contemporary', 'individual', 'prime'],
-}
-
-
+  neutral: ["basic", "light", "solid"],
+  vision: ["elegant", "young", "glossy"],
+  spotlight: ["classic", "pure", "fresh"],
+  limelight: ["bold", "harmonic", "current"],
+  editorial: ["modern", "vintage", "vivid"],
+  uptown: ["cool", "deep", "sweet"],
+  structure: ["contemporary", "individual", "prime"]
+};
 
 const markAsNotEpages = () => {
   document.getElementById("loading").style.display = "none";
@@ -34,32 +32,57 @@ const markAsNotEpages = () => {
 
 (async () => {
   const tab = await getTab();
-  const themeSelect = document.getElementById("theme-select")
-  const themeButton = document.getElementById("theme-button")
-  const styleSelect = document.getElementById("style-select")
-  const emptyOption = document.getElementById("empty-option")
+  const urlObj = new URL(tab.url);
+  const themeSelect = document.getElementById("theme-select");
+  const themeButton = document.getElementById("theme-button");
+  const styleSelect = document.getElementById("style-select");
 
-  Object.keys(themes).forEach((theme) => {
-    const option = document.createElement("option")
+  Object.keys(themes).forEach(theme => {
+    const option = document.createElement("option");
     option.setAttribute("value", theme);
-    option.innerText = `Theme ${theme.charAt(0).toUpperCase()}${theme.slice(1)}`;
-    themeSelect.appendChild(option)
-  })
+    option.innerText = `Theme ${theme.charAt(0).toUpperCase()}${theme.slice(
+      1
+    )}`;
+    themeSelect.appendChild(option);
+  });
 
-  themeButton.onclick = () => {
-    const theme = themeSelect.value
-    const style = styleSelect.value
-    chrome.tabs.update(tab.id, { url: `${tab.url}?ViewAction=UnityMBO-ViewSFThemePreview&previewTheme=epages.${theme}@dev&themeStyle=${style}` });
+  const currentTheme = urlObj.searchParams.get("previewTheme");
+  const currentStyle = urlObj.searchParams.get("themeStyle");
+  if (currentTheme) {
+    const [, themeString] = /epages\.(.*?)@dev/.exec(currentTheme);
+    if (themeString) {
+      const emptyOption = document.getElementById("empty-option");
+      if (emptyOption) themeSelect.removeChild(emptyOption);
+      themeSelect.value = themeString;
+      // if (currentStyle) {
+      //   styleSelect.value = currentStyle;
+      // }
+    }
+  }
+
+  themeButton.onclick = async () => {
+    const tab = await getTab();
+    const url = new URL(tab.url);
+
+    const theme = themeSelect.value;
+    const style = styleSelect.value;
+    url.searchParams.set("ViewAction", "UnityMBO-ViewSFThemePreview");
+    url.searchParams.set("previewTheme", `epages.${theme}@dev`);
+    url.searchParams.set("themeStyle", style);
+    chrome.tabs.update(tab.id, { url: url.toJSON() });
   };
 
   themeSelect.onchange = () => {
-    if (emptyOption) themeSelect.removeChild(emptyOption)
+    const emptyOption = document.getElementById("empty-option");
+    if (emptyOption) themeSelect.removeChild(emptyOption);
     styleSelect.style.display = "block";
-    styleSelect.innerHTML = '';
+    styleSelect.innerHTML = "";
     themes[themeSelect.value].forEach(style => {
-      const option = document.createElement("option")
+      const option = document.createElement("option");
       option.setAttribute("value", style);
-      option.innerText = `Style ${style.charAt(0).toUpperCase()}${style.slice(1)}`;
+      option.innerText = `Style ${style.charAt(0).toUpperCase()}${style.slice(
+        1
+      )}`;
       styleSelect.appendChild(option);
     });
   };
