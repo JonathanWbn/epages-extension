@@ -11,6 +11,10 @@ const looksLikeAnEpagesVersion = version =>
       version.tag
   );
 
+export function uppercaseFirst(str) {
+  return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
 export const getTab = async () => {
   if (chrome) {
     return new Promise(resolve => {
