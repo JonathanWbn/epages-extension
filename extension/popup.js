@@ -90,7 +90,7 @@ function setTheme(tab, theme, style) {
   url.searchParams.set("ViewAction", "UnityMBO-ViewSFThemePreview");
   url.searchParams.set("previewTheme", `epages.${theme}@dev`);
   url.searchParams.set("themeStyle", style);
-  chrome.tabs.update(tab.id, { url: url.toJSON() });
+  chrome.tabs.update(tab.id, { url: decodeURIComponent(url.toJSON()) });
 }
 
 (async () => {
