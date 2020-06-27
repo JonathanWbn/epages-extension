@@ -1,11 +1,6 @@
 "use strict";
 
-import {
-  getEpagesVersion,
-  getTab,
-  looksLikeABaseShop,
-  uppercaseFirst
-} from "./helpers.js";
+import { getTab, uppercaseFirst } from "./helpers.js";
 
 const themes = {
   neutral: ["basic", "light", "solid"],
@@ -14,59 +9,87 @@ const themes = {
   limelight: ["bold", "harmonic", "current"],
   editorial: ["modern", "vintage", "vivid"],
   uptown: ["cool", "deep", "sweet"],
-  structure: ["contemporary", "individual", "prime"]
+  structure: ["contemporary", "individual", "prime"],
 };
 
 window.browser = window.browser || window.chrome;
 
-async function isBeyondShop(url) {
-  try {
-    const response = await fetch(`${url}/api/v2/shop`);
-    const shop = await response.json();
-
-    return Boolean(shop.beyond);
-  } catch {
-    return false;
-  }
-}
-
-function markAsNotEpages() {
-  document.getElementById("loading").style.display = "none";
-  document.getElementById("not-epages").style.display = "block";
-}
-
-function initializeThemesDropdown() {
-  const themeSelect = document.getElementById("theme-select");
-
-  Object.keys(themes).forEach(theme => {
-    const option = document.createElement("option");
-    option.setAttribute("value", theme);
-    option.innerText = `Theme ${uppercaseFirst(theme)}`;
-    themeSelect.appendChild(option);
-  });
-}
-
-function selectTheme(theme) {
+(async () => {
+  const tab = await getTab();
   const themeSelect = document.getElementById("theme-select");
   const styleSelect = document.getElementById("style-select");
-  const emptyOption = document.getElementById("empty-option");
+  const styleHeading = document.getElementById("style-heading");
+  const submitButton = document.getElementById("open");
 
-  if (emptyOption) themeSelect.removeChild(emptyOption);
-  themeSelect.value = theme;
+  initializeThemes();
 
-  styleSelect.style.display = "block";
-  styleSelect.innerHTML = "";
-  themes[theme].forEach(style => {
-    const option = document.createElement("option");
-    option.setAttribute("value", style);
-    option.innerText = `Style ${style.charAt(0).toUpperCase()}${style.slice(
-      1
-    )}`;
-    styleSelect.appendChild(option);
-  });
-}
+  let { theme: selectedTheme, style: selectedStyle } = getStyle(tab);
 
-function selectStyle(style) {}
+  if (themes[selectedTheme]) selectTheme(selectedTheme);
+  if (selectedStyle) selectStyle(selectedStyle);
+
+  submitButton.onclick = async () => {
+    const tab = await getTab();
+
+    setTheme(tab, selectedTheme, selectedStyle);
+    window.close();
+  };
+
+  function initializeThemes() {
+    Object.keys(themes).forEach((theme) => {
+      const option = document.createElement("div");
+      option.setAttribute("id", theme);
+      option.innerText = uppercaseFirst(theme);
+      option.onclick = () => selectTheme(theme);
+      themeSelect.appendChild(option);
+    });
+  }
+
+  function selectTheme(theme) {
+    if (
+      [...themeSelect.childNodes].find(
+        (child) =>
+          child.getAttribute("id") === theme &&
+          child.classList.contains("selected")
+      )
+    ) {
+      return;
+    }
+    themeSelect.childNodes.forEach((child) => {
+      if (child.getAttribute("id") === theme) {
+        selectedTheme = theme;
+        child.classList.add("selected");
+      } else {
+        child.classList.remove("selected");
+      }
+    });
+
+    styleSelect.style.display = "flex";
+    styleHeading.style.display = "block";
+    submitButton.style.display = "none";
+
+    styleSelect.innerHTML = "";
+    themes[theme].forEach((style) => {
+      const option = document.createElement("div");
+      option.setAttribute("id", style);
+      option.innerText = uppercaseFirst(style);
+      option.onclick = () => selectStyle(style);
+      styleSelect.appendChild(option);
+    });
+  }
+
+  function selectStyle(style) {
+    styleSelect.childNodes.forEach((child) => {
+      if (child.getAttribute("id") === style) {
+        child.classList.add("selected");
+        selectedStyle = style;
+        submitButton.style.display = "block";
+      } else {
+        child.classList.remove("selected");
+      }
+    });
+  }
+})();
 
 function getStyle(tab) {
   const res = {};
@@ -92,63 +115,3 @@ function setTheme(tab, theme, style) {
   url.searchParams.set("themeStyle", style);
   chrome.tabs.update(tab.id, { url: decodeURIComponent(url.toJSON()) });
 }
-
-(async () => {
-  const tab = await getTab();
-  const themeSelect = document.getElementById("theme-select");
-  const themeButton = document.getElementById("theme-button");
-
-  initializeThemesDropdown();
-  const { theme, style } = getStyle(tab);
-
-  if (theme) selectTheme(theme);
-  if (style) selectStyle(style);
-
-  themeButton.onclick = async () => {
-    const tab = await getTab();
-    const theme = themeSelect.value;
-    const style = document.getElementById("style-select").value;
-
-    setTheme(tab, theme, style);
-  };
-
-  themeSelect.onchange = () => {
-    selectTheme(document.getElementById("theme-select").value);
-  };
-
-  if (!tab) return markAsNotEpages();
-
-  browser.tabs.executeScript({ file: "background-content.js" });
-  const isEpagesShop = await new Promise(resolve => {
-    browser.tabs.sendMessage(
-      tab.id,
-      { text: "is_epages_shop" },
-      async isEpagesShop => {
-        resolve(isEpagesShop);
-      }
-    );
-  });
-
-  const url = tab && tab.url;
-  if (!url || !isEpagesShop) return markAsNotEpages();
-
-  const [baseUrl] = url.match(
-    /^(?:https?:\/\/)?(?:[^@\/\n]+@)?(?:www\.)?([^:\/?\n]+)/
-  );
-  const ePagesVersion = await getEpagesVersion(baseUrl);
-
-  if (ePagesVersion) {
-    const beyondShop = await isBeyondShop(baseUrl);
-    const product = beyondShop ? "BEYOND" : "NOW";
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("product").innerText = product;
-    document.getElementById("version").innerText = `${
-      ePagesVersion.describe
-    } (${window.moment(ePagesVersion.authorDate).fromNow()})`;
-  } else if (await looksLikeABaseShop(baseUrl)) {
-    document.getElementById("loading").style.display = "none";
-    document.getElementById("product").innerText = "BASE";
-  } else {
-    markAsNotEpages();
-  }
-})();
