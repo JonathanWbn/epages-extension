@@ -2,7 +2,7 @@
   "name": "ePages Themes",
   "version": "2.0",
   "description": "Switching ePages themes has never been easier.",
-  "permissions": ["tabs", "http://*/*", "https://*/*"],
+  "permissions": ["tabs"],
   "browser_action": {
     "default_popup": "popup.html",
     "default_icon": "images/epages.png"
